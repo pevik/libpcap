@@ -1284,6 +1284,7 @@ swap_linux_sll_header(const struct pcap_pkthdr *hdr, u_char *buf)
 	}
 
 	protocol = EXTRACT_16BITS(&shdr->sll_protocol);
+	// TODO: DLT_LINUX_SLL2
 	if (protocol != LINUX_SLL_P_CAN && protocol != LINUX_SLL_P_CANFD)
 		return;
 
@@ -1525,6 +1526,7 @@ swap_pseudo_headers(int linktype, struct pcap_pkthdr *hdr, u_char *data)
 	switch (linktype) {
 
 	case DLT_LINUX_SLL:
+	case DLT_LINUX_SLL2:
 		swap_linux_sll_header(hdr, data);
 		break;
 

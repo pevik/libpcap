@@ -360,6 +360,9 @@
 /* define on AIX to get certain functions */
 #cmakedefine _SUN 1
 
+/* enable new LINKTYPE_LINUX_SLL2 capture support on Linux instead of legacy LINKTYPE_LINUX_SLL */
+#cmakedefine PCAP_SUPPORT_SLL_V2 1
+
 #if 0
 /* on sinix */
 #cmakedefine sinix 1

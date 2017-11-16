@@ -1331,6 +1331,7 @@ init_linktype(compiler_state_t *cstate, pcap_t *p)
 		break;
 
 	case DLT_LINUX_SLL:	/* fake header for Linux cooked socket */
+	case DLT_LINUX_SLL2:
 		cstate->off_linktype.constant_part = 14;
 		cstate->off_linkpl.constant_part = 16;
 		cstate->off_nl = 0;
@@ -3136,6 +3137,7 @@ gen_linktype(compiler_state_t *cstate, int proto)
 		break;
 
 	case DLT_LINUX_SLL:
+	case DLT_LINUX_SLL2:
 		return gen_linux_sll_linktype(cstate, proto);
 		/*NOTREACHED*/
 		break;
@@ -7725,6 +7727,7 @@ gen_inbound(compiler_state_t *cstate, int dir)
 		break;
 
 	case DLT_LINUX_SLL:
+	case DLT_LINUX_SLL2:
 		/* match outgoing packets */
 		b0 = gen_cmp(cstate, OR_LINKHDR, 0, BPF_H, LINUX_SLL_OUTGOING);
 		if (!dir) {

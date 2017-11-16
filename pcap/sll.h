@@ -75,19 +75,36 @@
 #define lib_pcap_sll_h
 
 /*
- * A DLT_LINUX_SLL fake link-layer header.
+ * DLT_LINUX_SLL and DLT_LINUX_SLL2 fake link-layer header.
+ * Uses PCAP_SUPPORT_SLL_V2 from config.h.
  */
-#define SLL_HDR_LEN	16		/* total header length */
+/* total header length */
+#ifdef PCAP_SUPPORT_SLL_V2
+#define SLL_HDR_LEN	24
+#else
+#define SLL_HDR_LEN	16
+#endif
+
 #define SLL_ADDRLEN	8		/* length of address field */
 
 #include <pcap/pcap-inttypes.h>
 
 struct sll_header {
+#ifdef PCAP_SUPPORT_SLL_V2
+	uint16_t sll_protocol;		/* protocol */
+	uint16_t reserved;		/* reserved */
+	int32_t sll_ifindex;		/* interface index, DLT_LINUX_SLL2 ONLY! */
+	uint16_t sll_hatype;		/* link-layer address type */
+	uint16_t sll_pkttype;		/* packet type */
+	uint16_t sll_halen;		/* link-layer address length */
+	uint8_t sll_addr[SLL_ADDRLEN];	/* link-layer address */
+#else
 	uint16_t sll_pkttype;		/* packet type */
 	uint16_t sll_hatype;		/* link-layer address type */
 	uint16_t sll_halen;		/* link-layer address length */
 	uint8_t sll_addr[SLL_ADDRLEN];	/* link-layer address */
 	uint16_t sll_protocol;		/* protocol */
+#endif
 };
 
 /*

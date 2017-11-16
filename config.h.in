@@ -325,6 +325,10 @@
 /* target host supports RDMA sniffing */
 #undef PCAP_SUPPORT_RDMASNIFF
 
+/* enable new LINKTYPE_LINUX_SLL2 capture support on Linux instead of legacy
+   LINKTYPE_LINUX_SLL */
+#undef PCAP_SUPPORT_SLL_V2
+
 /* target host supports USB sniffing */
 #undef PCAP_SUPPORT_USB
 

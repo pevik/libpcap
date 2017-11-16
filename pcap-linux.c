@@ -1716,6 +1716,7 @@ linux_check_direction(const pcap_t *handle, const struct sockaddr_ll *sll)
 		 * layer than those received by the CAN layer, so we
 		 * eliminate this packet instead.
 		 */
+		// TODO: DLT_LINUX_SLL2
 		if ((sll->sll_protocol == LINUX_SLL_P_CAN ||
 		     sll->sll_protocol == LINUX_SLL_P_CANFD) &&
 		     handle->direction != PCAP_D_OUT)
@@ -1910,6 +1911,9 @@ pcap_read_packet(pcap_t *handle, pcap_handler callback, u_char *userdata)
 
 		hdrp = (struct sll_header *)bp;
 		hdrp->sll_pkttype = map_packet_type_to_sll_type(from.sll_pkttype);
+#ifdef PCAP_SUPPORT_SLL_V2
+		hdrp->sll_ifindex = htons(from.sll_ifindex);
+#endif
 		hdrp->sll_hatype = htons(from.sll_hatype);
 		hdrp->sll_halen = htons(from.sll_halen);
 		memcpy(hdrp->sll_addr, from.sll_addr,
@@ -3279,6 +3283,7 @@ static void map_arphrd_to_dlt(pcap_t *handle, int sock_fd, int arptype,
 		 * Otherwise, we'll just fail.
 		 */
 		if (cooked_ok)
+			// TODO: DLT_LINUX_SLL2
 			handle->linktype = DLT_LINUX_SLL;
 		else
 			handle->linktype = -1;
@@ -3326,6 +3331,7 @@ static void map_arphrd_to_dlt(pcap_t *handle, int sock_fd, int arptype,
 		 * new DLT_ type, if necessary).
 		 */
 		if (cooked_ok)
+			// TODO: DLT_LINUX_SLL2
 			handle->linktype = DLT_LINUX_SLL;
 		else {
 			/*
@@ -3689,6 +3695,7 @@ activate_new(pcap_t *handle)
 		map_arphrd_to_dlt(handle, sock_fd, arptype, device, 1);
 		if (handle->linktype == -1 ||
 		    handle->linktype == DLT_LINUX_SLL ||
+		    handle->linktype == DLT_LINUX_SLL2 ||
 		    handle->linktype == DLT_LINUX_IRDA ||
 		    handle->linktype == DLT_LINUX_LAPD ||
 		    handle->linktype == DLT_NETLINK ||
@@ -3762,6 +3769,7 @@ activate_new(pcap_t *handle)
 			if (handle->linktype != DLT_LINUX_IRDA &&
 			    handle->linktype != DLT_LINUX_LAPD &&
 			    handle->linktype != DLT_NETLINK)
+				// TODO: DLT_LINUX_SLL2
 				handle->linktype = DLT_LINUX_SLL;
 		}
 
@@ -3796,7 +3804,11 @@ activate_new(pcap_t *handle)
 		 * It uses cooked mode.
 		 */
 		handlep->cooked = 1;
+#ifdef PCAP_SUPPORT_SLL_V2
+		handle->linktype = DLT_LINUX_SLL2;
+#else
 		handle->linktype = DLT_LINUX_SLL;
+#endif
 
 		/*
 		 * We're not bound to a device.
@@ -3892,6 +3904,7 @@ activate_new(pcap_t *handle)
 		break;
 
 	case DLT_LINUX_SLL:
+	case DLT_LINUX_SLL2:
 		/*
 		 * The type field is in the last 2 bytes of the
 		 * DLT_LINUX_SLL header.
@@ -4964,6 +4977,9 @@ static int pcap_handle_packet_mmap(
 		hdrp = (struct sll_header *)bp;
 		hdrp->sll_pkttype = map_packet_type_to_sll_type(
 						sll->sll_pkttype);
+#ifdef PCAP_SUPPORT_SLL_V2
+		hdrp->sll_ifindex = sll->sll_ifindex;
+#endif
 		hdrp->sll_hatype = htons(sll->sll_hatype);
 		hdrp->sll_halen = htons(sll->sll_halen);
 		memcpy(hdrp->sll_addr, sll->sll_addr, SLL_ADDRLEN);

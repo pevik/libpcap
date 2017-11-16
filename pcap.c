@@ -2841,7 +2841,11 @@ static struct dlt_choice dlt_choices[] = {
 	DLT_CHOICE(FRELAY, "Frame Relay"),
 	DLT_CHOICE(LOOP, "OpenBSD loopback"),
 	DLT_CHOICE(ENC, "OpenBSD encapsulated IP"),
+#ifdef PCAP_SUPPORT_SLL_V2
+	DLT_CHOICE(LINUX_SLL2, "Linux cooked v2"),
+#else
 	DLT_CHOICE(LINUX_SLL, "Linux cooked"),
+#endif
 	DLT_CHOICE(LTALK, "Localtalk"),
 	DLT_CHOICE(PFLOG, "OpenBSD pflog file"),
 	DLT_CHOICE(PFSYNC, "Packet filter state syncing"),
